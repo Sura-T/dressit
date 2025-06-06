@@ -6,6 +6,38 @@ const User = require('../models/user.model');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get user profile by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 // Get user profile by ID
 router.get('/:id', auth, async (req, res) => {
   try {
@@ -28,6 +60,60 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/users/me:
+ *   patch:
+ *     summary: Update current user's profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               nickname:
+ *                 type: string
+ *               bio:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               avatar_url:
+ *                 type: string
+ *               interested_in_genders:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   enum: [male, female, other]
+ *               interested_in_roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   enum: [man, woman]
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 // Update user profile
 router.patch('/me', auth, [
   body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
@@ -80,6 +166,31 @@ router.patch('/me', auth, [
   }
 });
 
+/**
+ * @swagger
+ * /api/users/me:
+ *   delete:
+ *     summary: Delete current user's account (soft delete)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 // Soft delete user account
 router.delete('/me', auth, async (req, res) => {
   try {
